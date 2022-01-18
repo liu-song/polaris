@@ -38,7 +38,7 @@ type Dispatcher struct {
 	selfServiceInstancesChanged uint32
 	managedInstances            map[string]*InstanceWithChecker
 
-	selfServiceBuckets map[Bucket]bool
+	selfServiceBuckets map[Bucket]bool //  这个Bucket的作用
 	continuum          *Continuum
 	mutex              *sync.Mutex
 }
@@ -123,6 +123,7 @@ func (d *Dispatcher) reloadSelfContinuum() bool {
 }
 
 func (d *Dispatcher) reloadManagedInstances() {
+	//  nextInstances 和 originInstances  的意思
 	nextInstances := make(map[string]*InstanceWithChecker)
 	var totalCount int
 	if nil != d.continuum {
@@ -165,9 +166,12 @@ func (d *Dispatcher) reloadManagedInstances() {
 
 func (d *Dispatcher) processEvent() {
 	var selfContinuumReloaded bool
+	// 标记清楚这两个分别是什么时候触发 selfServiceInstancesChanged
 	if atomic.CompareAndSwapUint32(&d.selfServiceInstancesChanged, 1, 0) {
 		selfContinuumReloaded = d.reloadSelfContinuum()
 	}
+
+	// 标记清楚这两个分别是什么时候触发 healthCheckInstancesChanged
 	if selfContinuumReloaded || atomic.CompareAndSwapUint32(&d.healthCheckInstancesChanged, 1, 0) {
 		d.reloadManagedInstances()
 	}

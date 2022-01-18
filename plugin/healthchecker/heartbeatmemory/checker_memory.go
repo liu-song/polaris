@@ -113,6 +113,7 @@ func (r *MemoryHealthChecker) AddToCheck(request *plugin.AddCheckRequest) error 
 	return nil
 }
 
+// 这里为啥是空
 // AddToCheck add the instances to check procedure
 func (r *MemoryHealthChecker) RemoveFromCheck(request *plugin.AddCheckRequest) error {
 	return nil

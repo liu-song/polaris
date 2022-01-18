@@ -126,7 +126,7 @@ func (c *CheckScheduler) doAdopt(ctx context.Context) {
 				instancesToRemove[instanceId] = true
 				delete(instancesToAdd, instanceId)
 			}
-			checker = event.Checker
+			checker = event.Checker // 批次添加
 			if len(instancesToAdd) == batchAdoptCount {
 				instancesToAdd = c.processAdoptEvents(instancesToAdd, true, checker)
 			}
@@ -134,6 +134,7 @@ func (c *CheckScheduler) doAdopt(ctx context.Context) {
 				instancesToRemove = c.processAdoptEvents(instancesToRemove, false, checker)
 			}
 		case <-ticker.C:
+			//  时间到了直接处理
 			if len(instancesToAdd) > 0 {
 				instancesToAdd = c.processAdoptEvents(instancesToAdd, true, checker)
 			}
@@ -172,7 +173,7 @@ func (c *CheckScheduler) processAdoptEvents(
 			instanceIds, server.localHost, add)
 		return instances
 	}
-	return make(map[string]bool)
+	return make(map[string]bool) //  重新赋值的操作
 }
 
 func (c *CheckScheduler) addAdopting(instanceId string, checker plugin.HealthChecker) {
@@ -227,11 +228,13 @@ func (c *CheckScheduler) getInstanceValue(instanceId string) (*instanceValue, bo
 }
 
 // AddInstance add instance to check
+// 添加相关的实例
 func (c *CheckScheduler) AddInstance(instanceWithChecker *InstanceWithChecker) {
 	exists, instValue := c.putIfAbsent(instanceWithChecker)
 	if exists {
 		return
 	}
+	// 转换成实例通知
 	c.addAdopting(instValue.id, instValue.checker)
 	instance := instanceWithChecker.instance
 	log.Infof("[Health Check][Check]add check instance is %s, host is %s:%d",

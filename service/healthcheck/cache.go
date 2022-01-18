@@ -58,6 +58,7 @@ func (c *CacheProvider) isSelfServiceInstance(instance *api.Instance) bool {
 	return false
 }
 
+//  事件触发通知改变，包含两种类型
 func (c *CacheProvider) sendEvent(event CacheEvent) {
 	server.dispatcher.UpdateStatusByEvent(event)
 }
