@@ -224,14 +224,14 @@ func (ic *instanceCache) setInstances(ins map[string]*model.Instance) (int, int)
 		progress++
 		if progress%50000 == 0 {
 			log.CacheScope().Infof("[Cache][Instance] set instances progress: %d / %d", progress, len(ins))
-		}
+		} //  实例的个数不会超过 5 万 ？
 		modifyTime := item.ModifyTime.Unix()
 		if lastMtime < modifyTime {
 			lastMtime = modifyTime
 		}
 		affect[item.ServiceID] = true
 		_, itemExist := ic.ids.Load(item.ID())
-		// 待删除的instance
+		// 待删除的instance     //  先删除失效的实例
 		if !item.Valid {
 			del++
 			ic.ids.Delete(item.ID())
@@ -258,7 +258,7 @@ func (ic *instanceCache) setInstances(ins map[string]*model.Instance) (int, int)
 
 		ic.ids.Store(item.ID(), item)
 		if !itemExist {
-			instanceCount++
+			instanceCount++ // 之前存在的就新建 ，实例数量会新增
 			ic.manager.onEvent(item, EventCreated)
 		} else {
 			ic.manager.onEvent(item, EventUpdated)

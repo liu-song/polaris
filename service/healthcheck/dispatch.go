@@ -130,7 +130,7 @@ func (d *Dispatcher) reloadManagedInstances() {
 		server.cacheProvider.RangeHealthCheckInstances(func(instance *InstanceWithChecker) {
 			instanceId := instance.instance.ID()
 			host := d.continuum.Hash(instance.hashValue)
-			if host == server.localHost {
+			if host == server.localHost { // 是在本机的情况
 				nextInstances[instanceId] = instance
 			}
 			totalCount++
@@ -140,6 +140,7 @@ func (d *Dispatcher) reloadManagedInstances() {
 		len(nextInstances), server.localHost, totalCount)
 	originInstances := d.managedInstances
 	d.managedInstances = nextInstances
+	//  这种情况多吗
 	if len(nextInstances) > 0 {
 		for id, instance := range nextInstances {
 			if len(originInstances) == 0 {

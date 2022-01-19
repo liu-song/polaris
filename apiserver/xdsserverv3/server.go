@@ -771,7 +771,7 @@ func (x *XDSServer) startSynTask(ctx context.Context) error {
 				x.registryInfo[ns] = infos
 				continue
 			}
-
+			// keypoint
 			// todo 不考虑命名空间删除的情况
 			// 判断当前这个空间，是否需要更新配置
 			if x.checkUpdate(infos, cacheServiceInfos) {

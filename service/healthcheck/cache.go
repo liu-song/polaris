@@ -65,24 +65,25 @@ func (c *CacheProvider) sendEvent(event CacheEvent) {
 
 func compareAndStoreServiceInstance(
 	instanceWithChecker *InstanceWithChecker, mutex *sync.RWMutex, values map[string]*InstanceWithChecker) bool {
-	mutex.Lock()
+	mutex.Lock() //多个停留在这里，第一个到的先运行，后续的等待，
 	defer mutex.Unlock()
 	instanceId := instanceWithChecker.instance.ID()
-	value, ok := values[instanceId]
-	if !ok {
+	value, ok := values[instanceId] //  第二次的时候，这里就是ok了      //  shardmap 的话，这里是同时读
+	if !ok {                        //  存两次是针对相同的instanceId ，都不存在的情况下 。如果instanceId 是不同的，没有影响
+		//  如果没有锁就同时到达了，都会去重新存储一边 。
 		log.Infof("[Health Check][Cache]create service instance is %s:%d, id is %s",
 			instanceWithChecker.instance.Host(), instanceWithChecker.instance.Port(),
-			instanceId)
+			instanceId) //  第一次创建不存在的时候，创建，然后直接返回    //  不存在的情况会存两次
 		values[instanceId] = instanceWithChecker
 		return true
 	}
 	lastInstance := value.instance
 	if lastInstance.Revision() == instanceWithChecker.instance.Revision() {
-		return false
+		return false // 版本一致，不需要变更，直接返回
 	}
 	log.Infof("[Health Check][Cache]update service instance is %s:%d, id is %s",
 		instanceWithChecker.instance.Host(), instanceWithChecker.instance.Port(), instanceId)
-	values[instanceId] = instanceWithChecker
+	values[instanceId] = instanceWithChecker //  不一致，存储新的
 	return true
 }
 
@@ -131,7 +132,7 @@ func (c *CacheProvider) OnCreated(value interface{}) {
 	if instance, ok := value.(*model.Instance); ok {
 		instProto := instance.Proto
 		if c.isSelfServiceInstance(instProto) {
-			storeServiceInstance(
+			storeServiceInstance( //  这里的情况是仅仅想存这个值，并发的话，也是的，因为是创建新的key，value 不存在重复存的情况。
 				newInstanceWithChecker(instance, nil), c.selfServiceMutex, c.selfServiceInstances)
 			c.sendEvent(CacheEvent{selfServiceInstancesChanged: true})
 			return
