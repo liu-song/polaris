@@ -267,10 +267,8 @@ func (ss *serviceStore) GetMoreServices(
 			}
 
 			serviceMtime := svcMTime.(time.Time)
-			if serviceMtime.Before(mtime) {
-				return false
-			}
-			return true
+
+			return !serviceMtime.Before(mtime)
 		})
 
 	if err != nil {
@@ -378,10 +376,8 @@ func (ss *serviceStore) GetServiceAliases(
 	refServices, err := ss.handler.LoadValuesByFilter(tblNameService, fields, &model.Service{},
 		func(m map[string]interface{}) bool {
 			_, ok := referenceService[m[SvcFieldID].(string)]
-			if !ok {
-				return false
-			}
-			return true
+
+			return ok
 		})
 
 	// sort and limit

@@ -86,9 +86,7 @@ func (h *HTTPServer) watchConfigFile(req *restful.Request, rsp *restful.Response
 
 	h.addConn(clientId, watchFiles, handler, finishChan)
 
-	select {
-	case <-finishChan:
-		h.removeConn(clientId, watchFiles)
-		return
-	}
+	<-finishChan
+	h.removeConn(clientId, watchFiles)
+
 }

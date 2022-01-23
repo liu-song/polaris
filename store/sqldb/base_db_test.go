@@ -46,7 +46,7 @@ func TestRetry(t *testing.T) {
 			err = nil
 			return nil
 		})
-		sub := time.Now().Sub(start)
+		sub := time.Since(start)
 		So(err, ShouldBeNil)
 		So(sub, ShouldBeGreaterThan, time.Millisecond*100)
 	})
@@ -59,7 +59,7 @@ func TestRetry(t *testing.T) {
 				return err
 			})
 			So(err, ShouldNotBeNil)
-			So(time.Now().Sub(start), ShouldBeGreaterThan, time.Millisecond*100)
+			So(time.Since(start), ShouldBeGreaterThan, time.Millisecond*100)
 		}
 	})
 }
@@ -79,7 +79,7 @@ func TestRetryTransaction(t *testing.T) {
 		})
 		So(err, ShouldNotBeNil)
 		So(err.Error(), ShouldEqual, "Deadlock")
-		sub := time.Now().Sub(start)
+		sub := time.Since(start)
 		t.Logf("%v", sub)
 		So(sub, ShouldBeGreaterThan, time.Millisecond*100)
 
@@ -88,7 +88,7 @@ func TestRetryTransaction(t *testing.T) {
 			return errors.New("other error")
 		})
 		So(err, ShouldNotBeNil)
-		sub = time.Now().Sub(start)
+		sub = time.Since(start)
 		So(sub, ShouldBeLessThan, time.Millisecond*5)
 	})
 }
@@ -123,7 +123,7 @@ func TestBatchOperation(t *testing.T) {
 	})
 
 	Convey("data大小为100", t, func() {
-		data := make([]interface{}, 100, 100)
+		data := make([]interface{}, 100)
 		num := 0
 		err := BatchOperation("data为100", data, func(objects []interface{}) error {
 			num++
@@ -134,7 +134,7 @@ func TestBatchOperation(t *testing.T) {
 	})
 
 	Convey("data大小为0", t, func() {
-		data := make([]interface{}, 0, 0)
+		data := make([]interface{}, 0)
 		num := 0
 		err := BatchOperation("data为100", data, func(objects []interface{}) error {
 			num++

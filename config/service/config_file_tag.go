@@ -76,8 +76,7 @@ func (cs *Impl) CreateConfigFileTags(ctx context.Context, namespace, group, file
 	}
 
 	var toCreateTags []string
-	for key, _ := range newTagMap {
-		newTagValues := newTagMap[key]
+	for key, newTagValues := range newTagMap {
 		storedTagValues := storedTagMap[key]
 		for _, newTagValue := range newTagValues {
 			if storedTagValues == nil {
@@ -103,9 +102,8 @@ func (cs *Impl) CreateConfigFileTags(ctx context.Context, namespace, group, file
 
 	//3. 删除 tag
 	var toDeleteTags []string
-	for key, _ := range storedTagMap {
+	for key, storedTagValues := range storedTagMap {
 		newTagValues := newTagMap[key]
-		storedTagValues := storedTagMap[key]
 		for _, storedTagValue := range storedTagValues {
 			if newTagValues == nil {
 				toDeleteTags = append(toDeleteTags, key)

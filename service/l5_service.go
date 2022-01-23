@@ -321,7 +321,7 @@ func (s *Server) getCalleeByRoute(route *model.Route) []*model.Callee {
 			return true, nil
 		})
 
-	if hasInstance == false {
+	if !hasInstance {
 		return nil
 	}
 
@@ -448,7 +448,7 @@ func (s *Server) getCl5DiscoverList(ctx context.Context, clientIP uint32) *l5.Cl
 			continue
 		}
 		// 过滤掉不健康或者隔离状态的server
-		if entry.Healthy() == false || entry.Isolate() == true {
+		if !entry.Healthy() || entry.Isolate() {
 			continue
 		}
 		ip := ParseIPStr2IntV2(entry.Host())

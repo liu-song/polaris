@@ -428,7 +428,6 @@ func SelfDeregister() {
 		}
 	}
 
-	return
 }
 
 // 获取本地IP地址

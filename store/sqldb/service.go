@@ -19,7 +19,6 @@ package sqldb
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	commontime "github.com/polarismesh/polaris-server/common/time"
 	"github.com/polarismesh/polaris-server/common/utils"
@@ -652,8 +651,7 @@ func (ss *serviceStore) getServiceMeta(id string) (map[string]string, error) {
 // 获取service内部函数
 func (ss *serviceStore) getService(name string, namespace string) (*model.Service, error) {
 	if name == "" || namespace == "" {
-		return nil, errors.New(
-			fmt.Sprintf("get Service missing some params, name is %s, namespace is %s", name, namespace))
+		return nil, fmt.Errorf("get Service missing some params, name is %s, namespace is %s", name, namespace)
 	}
 
 	out, err := ss.getServiceMain(name, namespace)

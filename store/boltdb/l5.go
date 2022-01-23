@@ -18,7 +18,6 @@
 package boltdb
 
 import (
-	"errors"
 	"fmt"
 	"github.com/boltdb/bolt"
 	"github.com/polarismesh/polaris-server/common/model"
@@ -91,11 +90,11 @@ func (l *l5Store) GenNextL5Sid(layoutID uint32) (string, error) {
 	err := l.handler.Execute(true, func(tx *bolt.Tx) error {
 		tblBucket := tx.Bucket([]byte(tblNameL5))
 		if nil == tblBucket {
-			return errors.New(fmt.Sprintf("[BlobStore] table bucket %s not exists", tblNameL5))
+			return fmt.Errorf("[BlobStore] table bucket %s not exists", tblNameL5)
 		}
 		rowBucket := tblBucket.Bucket([]byte(rowSidKey))
 		if nil == rowBucket {
-			return errors.New(fmt.Sprintf("[BlobStore] row bucket %s not exists", rowSidKey))
+			return fmt.Errorf("[BlobStore] row bucket %s not exists", rowSidKey)
 		}
 		midBytes := rowBucket.Get([]byte(colModuleId))
 		mid, err := decodeUintBuffer(colModuleId, midBytes, typeUint32)
